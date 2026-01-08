@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/throw-money-game/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Хвърляй пари! - Throw Money!</title>
     
     <!-- GoatCounter Analytics (Privacy-friendly, No cookies) -->
@@ -18,10 +20,19 @@
         justify-content: center;
         align-items: center;
         min-height: 100vh;
+        /* Support for Safari's safe area insets (notch, bottom bar) */
+        min-height: 100dvh; /* Dynamic viewport height */
+        padding-bottom: env(safe-area-inset-bottom);
         background: #1a1a1a;
       }
+      
+      #game {
+        /* Ensure game respects safe areas on iOS */
+        width: 100%;
+        height: 100%;
+      }
     </style>
-    <script type="module" crossorigin src="/throw-money-game/assets/index-BfYIxnlF.js"></script>
+    <script type="module" crossorigin src="/throw-money-game/assets/index-D0LZdct2.js"></script>
   </head>
   <body>
     <div id="game"></div>
