@@ -101,12 +101,13 @@ export default class GameOverScene extends Phaser.Scene {
       this.scene.start('GameScene');
     });
 
-    // Menu button
-    const menuButton = this.add.rectangle(width / 2, height * 0.78, 200, 60, 0x2196F3)
+    // Menu button - moved higher to avoid Safari bottom bar
+    const menuButtonY = height - 100; // Changed from height * 0.78 (~78% which could be too low)
+    const menuButton = this.add.rectangle(width / 2, menuButtonY, 200, 60, 0x2196F3)
       .setStrokeStyle(4, 0xFFFFFF)
       .setInteractive({ useHandCursor: true });
 
-    const menuText = this.add.text(width / 2, height * 0.78, 'МЕНЮ', {
+    const menuText = this.add.text(width / 2, menuButtonY, 'МЕНЮ', {
       fontSize: '24px',
       color: '#ffffff',
       fontStyle: 'bold',

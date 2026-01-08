@@ -1,9 +1,8 @@
 import Phaser from 'phaser';
 import Money from '../entities/Money';
-import { getCurrentCurrency, getCurrentMusicTrack, getCurrencyConfig } from '../config/currencies';
+import { getCurrentCurrency, getCurrentMusicTrack, getCurrencyConfig, getMusicKey } from '../config/currencies';
 
 export default class GameScene extends Phaser.Scene {
-  private throwSound!: Phaser.Sound.BaseSound;
   private bgMusic!: Phaser.Sound.BaseSound;
   private score: number = 0;
   private scoreText!: Phaser.GameObjects.Text;
@@ -15,6 +14,7 @@ export default class GameScene extends Phaser.Scene {
   private isPaused: boolean = false;
   private pauseOverlay?: Phaser.GameObjects.Container;
   private comboResetTimer?: Phaser.Time.TimerEvent;
+  private gameStartTime: number = 0;
 
   constructor() {
     super('GameScene');
@@ -37,14 +37,10 @@ export default class GameScene extends Phaser.Scene {
     this.comboCount = 0;
     this.isMusicPlaying = false;
     this.isPaused = false;
+    this.gameStartTime = Date.now();
 
-    // 🔊 Create sound instances ONCE with reduced volume
-    this.throwSound = this.sound.add('throwSound', {
-      volume: 0.2  // Reduced from 0.6 to 0.2
-    });
-
-    // 🎵 Background music with loop - use selected track (song1-song6)
-    const musicKey = musicTrack === 'song1' ? 'bgMusic' : `bgMusic${musicTrack.substring(4)}`;
+    // 🎵 Background music with loop - use selected track
+    const musicKey = getMusicKey(musicTrack);
     this.bgMusic = this.sound.add(musicKey, {
       volume: 0.3,
       loop: false // Changed to false - play once until end
@@ -326,9 +322,6 @@ export default class GameScene extends Phaser.Scene {
         this.bgMusic.stop();
         this.bgMusic.destroy();
       }
-      if (this.throwSound) {
-        this.throwSound.stop();
-      }
       
       // Stop all remaining sounds
       this.sound.stopAll();
@@ -394,9 +387,6 @@ export default class GameScene extends Phaser.Scene {
         this.bgMusic.stop();
         this.bgMusic.destroy();
       }
-      if (this.throwSound) {
-        this.throwSound.stop();
-      }
       
       // Stop all remaining sounds
       this.sound.stopAll();
@@ -425,9 +415,6 @@ export default class GameScene extends Phaser.Scene {
     const money = new Money(this, x, y);
     money.throw();
     this.moneyGroup.add(money);
-
-    // 🔊 PLAY SOUND ON THROW
-    this.throwSound.play();
 
     // 🎵 Start or resume music on throw
     if (!this.isMusicPlaying) {
@@ -534,9 +521,6 @@ export default class GameScene extends Phaser.Scene {
       this.bgMusic.stop();
       this.bgMusic.destroy();
     }
-    if (this.throwSound) {
-      this.throwSound.stop();
-    }
     
     // Stop all remaining sounds
     this.sound.stopAll();
@@ -553,9 +537,6 @@ export default class GameScene extends Phaser.Scene {
     if (this.bgMusic) {
       this.bgMusic.stop();
       this.bgMusic.destroy();
-    }
-    if (this.throwSound) {
-      this.throwSound.stop();
     }
     
     // Stop all remaining sounds

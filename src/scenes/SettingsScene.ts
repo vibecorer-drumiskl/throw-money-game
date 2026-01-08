@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
+import { AVAILABLE_MUSIC_TRACKS } from '../config/currencies';
 
 export interface GameSettings {
   currency: 'BGN' | 'EUR';
-  musicTrack: 'song1' | 'song2' | 'song3' | 'song4' | 'song5' | 'song6';
+  musicTrack: string;
 }
 
 export default class SettingsScene extends Phaser.Scene {
   private selectedCurrency: 'BGN' | 'EUR' = 'BGN';
-  private selectedMusic: 'song1' | 'song2' | 'song3' | 'song4' | 'song5' | 'song6' = 'song1';
+  private selectedMusic: string = 'song1';
   
   private currencyButtons: Map<string, Phaser.GameObjects.Container> = new Map();
   private musicButtons: Map<string, Phaser.GameObjects.Container> = new Map();
@@ -58,24 +59,17 @@ export default class SettingsScene extends Phaser.Scene {
       strokeThickness: 4
     }).setOrigin(0.5);
 
-    // Music buttons - 3x2 grid layout
-    const musicStartY = 330;
-    const musicSpacingX = 110;
-    const musicSpacingY = 75;
-    
-    this.createMusicButton('song1', '♪ 1', width / 2 - musicSpacingX, musicStartY);
-    this.createMusicButton('song2', '♪ 2', width / 2, musicStartY);
-    this.createMusicButton('song3', '♪ 3', width / 2 + musicSpacingX, musicStartY);
-    this.createMusicButton('song4', '♪ 4', width / 2 - musicSpacingX, musicStartY + musicSpacingY);
-    this.createMusicButton('song5', '♪ 5', width / 2, musicStartY + musicSpacingY);
-    this.createMusicButton('song6', '♪ 6', width / 2 + musicSpacingX, musicStartY + musicSpacingY);
+    // Dynamically create music buttons based on available tracks
+    this.createDynamicMusicButtons(width, 330);
 
-    // Back button
-    const backButton = this.add.rectangle(width / 2, height - 60, 180, 50, 0x4CAF50)
+    // Back button - positioned higher to avoid Safari bottom bar
+    // Safari's bottom bar is ~44px on iPhone, so we add extra padding
+    const backButtonY = height - 100; // Changed from height - 60 to height - 100
+    const backButton = this.add.rectangle(width / 2, backButtonY, 180, 50, 0x4CAF50)
       .setStrokeStyle(4, 0xFFFFFF)
       .setInteractive({ useHandCursor: true });
 
-    const backText = this.add.text(width / 2, height - 60, 'НАЗАД', {
+    const backText = this.add.text(width / 2, backButtonY, 'НАЗАД', {
       fontSize: '24px',
       color: '#ffffff',
       fontStyle: 'bold',
@@ -107,6 +101,26 @@ export default class SettingsScene extends Phaser.Scene {
     // Update initial selection visuals
     this.updateCurrencySelection();
     this.updateMusicSelection();
+  }
+
+  createDynamicMusicButtons(width: number, startY: number) {
+    const tracks = AVAILABLE_MUSIC_TRACKS;
+    const buttonsPerRow = 3;
+    const spacingX = 110;
+    const spacingY = 75;
+    
+    tracks.forEach((trackNum, index) => {
+      const row = Math.floor(index / buttonsPerRow);
+      const col = index % buttonsPerRow;
+      
+      // Center the buttons
+      const offsetX = (buttonsPerRow - 1) * spacingX / 2;
+      const x = width / 2 - offsetX + col * spacingX;
+      const y = startY + row * spacingY;
+      
+      const songId = `song${trackNum}`;
+      this.createMusicButton(songId, `♪ ${trackNum}`, x, y);
+    });
   }
 
   createCurrencyButton(id: string, label: string, x: number, y: number) {
@@ -163,7 +177,7 @@ export default class SettingsScene extends Phaser.Scene {
     container.setInteractive({ useHandCursor: true });
 
     container.on('pointerdown', () => {
-      this.selectedMusic = id as 'song1' | 'song2' | 'song3' | 'song4' | 'song5' | 'song6';
+      this.selectedMusic = id;
       this.updateMusicSelection();
       
       // Stop all sounds to prevent any music from playing

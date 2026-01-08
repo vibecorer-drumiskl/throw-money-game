@@ -43,6 +43,11 @@ export const CURRENCIES: Record<string, CurrencyConfig> = {
   }
 };
 
+// Available music tracks - update this array to add/remove songs
+export const AVAILABLE_MUSIC_TRACKS = [1, 2, 3, 4, 5, 6, 7];
+
+export type MusicTrack = string;
+
 export function getCurrencyConfig(code: 'BGN' | 'EUR'): CurrencyConfig {
   const config = CURRENCIES[code];
   if (!config) {
@@ -73,14 +78,15 @@ export function getCurrentCurrency(): 'BGN' | 'EUR' {
   return 'BGN';
 }
 
-export function getCurrentMusicTrack(): 'song1' | 'song2' | 'song3' | 'song4' | 'song5' | 'song6' {
+export function getCurrentMusicTrack(): string {
   try {
     const settings = localStorage.getItem('gameSettings');
     if (settings) {
       const parsed = JSON.parse(settings);
       const track = parsed.musicTrack;
-      if (track === 'song1' || track === 'song2' || track === 'song3' || 
-          track === 'song4' || track === 'song5' || track === 'song6') {
+      // Validate that the track number exists in available tracks
+      const trackNum = parseInt(track?.replace('song', '') || '1');
+      if (AVAILABLE_MUSIC_TRACKS.includes(trackNum)) {
         return track;
       }
     }
@@ -88,4 +94,9 @@ export function getCurrentMusicTrack(): 'song1' | 'song2' | 'song3' | 'song4' | 
     console.error('Грешка при четене на музикалните настройки:', e);
   }
   return 'song1';
+}
+
+export function getMusicKey(trackId: string): string {
+  const trackNum = parseInt(trackId.replace('song', ''));
+  return trackNum === 1 ? 'bgMusic' : `bgMusic${trackNum}`;
 }

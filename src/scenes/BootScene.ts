@@ -78,16 +78,12 @@ export default class BootScene extends Phaser.Scene {
         this.load.image('eur_200', 'assets/images/currencies/eur/200.png');
         this.load.image('eur_500', 'assets/images/currencies/eur/500.png');
 
-        // Load audio - throw sound (relative path)
-        this.load.audio('throwSound', 'assets/sounds/click.mp3');
-
-        // Load all 6 music tracks (relative paths)
-        this.load.audio('bgMusic', 'assets/sounds/song1.mp3');
-        this.load.audio('bgMusic2', 'assets/sounds/song2.mp3');
-        this.load.audio('bgMusic3', 'assets/sounds/song3.mp3');
-        this.load.audio('bgMusic4', 'assets/sounds/song4.mp3');
-        this.load.audio('bgMusic5', 'assets/sounds/song5.mp3');
-        this.load.audio('bgMusic6', 'assets/sounds/song6.mp3');
+        // Dynamically load all music tracks from the sounds folder
+        // Load songs 1-7 (we have song1.mp3 through song7.mp3)
+        for (let i = 1; i <= 7; i++) {
+            const key = i === 1 ? 'bgMusic' : `bgMusic${i}`;
+            this.load.audio(key, `assets/sounds/song${i}.mp3`);
+        }
     }
 
     create() {
